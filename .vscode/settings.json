@@ -1,0 +1,8 @@
+{
+    "terminal.integrated.defaultProfile.windows": "NuShell",
+    "terminal.integrated.profiles.windows": {
+      "NuShell": {
+        "path": "C:\\Users\\Administrator\\AppData\\Local\\Programs\\nu\\bin\\nu.exe"
+      }
+    }
+  }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bun WebSocket Chat</title>
+    <style>
+        /* CSS 样式保持不变 */
+    </style>
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+    <div id="online-users">
+        <h3>Online Users</h3>
+        <ul id="user-list"></ul>
+    </div>
+    <ul id="messages"></ul>
+    <div id="message-form">
+        <select id="to-ip">
+            <option value="public">[All Users]</option>
+        </select>
+        <input id="message-input" type="text" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:3000/ws');
+
+        // 更新在线用户列表
+        function updateOnlineUsers(users) {
+            const userList = document.getElementById('user-list');
+            userList.innerHTML = users.map(user => `<li>${user}</li>`).join('');
+        }
+
+        // 添加消息到列表
+        function addMessage(message, messageType = '') {
+            const messages = document.getElementById('messages');
+            const li = document.createElement('li');
+            li.textContent = message;
+            li.className = messageType;
+            messages.appendChild(li);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // 处理接收到的消息
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            switch (data.type) {
+                case 'online':
+                    addMessage(data.message, 'info');
+                    updateOnlineUsers(data.onlineUsers);
+                    break;
+                case 'message':
+                    addMessage(`[Public] ${data.fromip}: ${data.message}`, 'public');
+                    break;
+                case 'private':
+                    addMessage(`[Private from ${data.fromip}] ${data.message}`, 'private');
+                    break;
+                case 'error':
+                    addMessage(`Error: ${data.message}`, 'error');
+                    break;
+                default:
+                    console.warn('Unknown message type:', data.type);
+            }
+        };
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const toIp = document.getElementById('to-ip').value;
+
+            const message = {
+                fromip: '192.168.1.1', // 替换为客户端的 IP 地址
+                toip: toIp,
+                message: input.value
+            };
+
+            socket.send(JSON.stringify(message));
+            input.value = '';
+        }
+
+        // 初始化
+        socket.onopen = () => {
+            console.log('Connected to server');
+        };
+
+        socket.onclose = () => {
+            console.log('Disconnected from server');
+        };
+    </script>
+</body>
+</html>
