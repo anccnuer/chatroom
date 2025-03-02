@@ -13,7 +13,7 @@ const clients = new Map<string, Client>();
 
 // 创建一个 Bun 服务器
 const server = Bun.serve({
-    port: 3000, // 服务器端口
+    port: 3030, // 服务器端口
     fetch(req: Request, server: any) {
         const url = new URL(req.url);
 
@@ -43,7 +43,7 @@ const server = Bun.serve({
                 ip,
                 state: 'open',
             });
-            ws.send(JSON.stringify({ type: "online", list: getOnlineUsers() }));
+            ws.send(JSON.stringify({ type: "online", myip:ip, list: getOnlineUsers() }));
 
             console.log(`New client connected: ${ip}`);
         },

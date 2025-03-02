@@ -8,7 +8,8 @@ A web chatroom
 {
     type: "online",
     list: [ip...],
-    user_num: int//未实现
+    user_num: int,//未实现
+    myip: ip,
 }
 ```
 + 所有消息都是json格式
